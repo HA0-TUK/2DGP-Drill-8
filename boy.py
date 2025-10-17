@@ -1,5 +1,5 @@
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT
+from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_a  
 
 from state_machine import StateMachine
 
@@ -79,10 +79,10 @@ def autorun_time_out(e):
 
 # 진입 키 입력
 def a_down(e):
-    pass
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
 
 class AUTORUN:
-    def __init__(self,boy):
+    def __init__(self, boy):
         self.boy = boy
 
         self.start_time = 0
@@ -90,7 +90,7 @@ class AUTORUN:
 
         self.scale = 1.0
 
-    def enter(self):
+    def enter(self, e):
         # a 키입력으로 진입
         self.start_time = get_time()
         self.boy.dir = self.boy.face_dir  # 현재 방향 유지
@@ -102,23 +102,33 @@ class AUTORUN:
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
-        # 키 조작 없이도 좌우로 계속 이동.
-        self.boy.x += self.boy.dir * self.speed
-        # 속도 증가
+        
+        # 시간에 따른 속도와 크기 증가
         elapsed_time = get_time() - self.start_time
         self.speed = 3 + (elapsed_time * 2)
         self.scale = 1.0 + (elapsed_time * 0.2)
-        # 크기 확대
-        # 화면 좌우 끝에서 방향전환.
+        
+        # 키 조작 없이도 좌우로 계속 이동
+        self.boy.x += self.boy.dir * self.speed
+        
+        # 화면 좌우 끝에서 방향전환
         if self.boy.x <= 50:
             self.boy.x = 50
             self.boy.dir = self.boy.face_dir = 1
         elif self.boy.x >= 750:
             self.boy.x = 750
             self.boy.dir = self.boy.face_dir = -1
+            
+        # 5초 후 타임아웃 이벤트 발생
+        if elapsed_time >= 5.0:
+            self.boy.state_machine.handle_state_event(('AUTORUN_TIME_OUT', None))
 
     def draw(self):
-        pass
+        size = int(100 * self.scale)
+        if self.boy.face_dir == 1: # right
+            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y, size, size)
+        else: # face_dir == -1: # left
+            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y, size, size)
 
 # 방향키 입력 시 AutoRun -> 눌린 방향 Run
 
@@ -133,16 +143,18 @@ class Boy:
         self.IDLE = Idle(self)
         self.SLEEP = Sleep(self)
         self.RUN = Run(self)
+        self.AUTORUN = AUTORUN(self)
         self.state_machine = StateMachine(
             self.IDLE,
             {
                 self.SLEEP : {space_down: self.IDLE},
-                self.IDLE : {time_out: self.SLEEP, space_down: self.SLEEP, right_down: self.RUN, left_down: self.RUN, right_up: self.RUN, left_up: self.RUN},
-                self.RUN : {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE}
-
+                self.IDLE : {time_out: self.SLEEP, space_down: self.SLEEP, right_down: self.RUN, left_down: self.RUN, right_up: self.RUN, left_up: self.RUN, a_down: self.AUTORUN},
+                self.RUN : {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE},
+                self.AUTORUN : {autorun_time_out: self.IDLE, right_down: self.RUN, left_down: self.RUN}
             }
         )
 
+    def update(self):
         self.state_machine.update()
 
     def handle_event(self, event):
