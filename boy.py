@@ -23,15 +23,22 @@ class Idle:
 
     def __init__(self, boy):
         self.boy = boy
+        self.start_time = 0
 
     def enter(self, e):
         self.boy.dir = 0
+        self.start_time = get_time()
 
     def exit(self, e):
         pass
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
+        
+        # 5초 후 TIME_OUT 이벤트 발생
+        elapsed_time = get_time() - self.start_time
+        if elapsed_time >= 5.0:
+            self.boy.state_machine.handle_state_event(('TIME_OUT', None))
 
     def draw(self):
         if self.boy.face_dir == 1: # right
@@ -61,7 +68,7 @@ class Run:
 class Sleep:
     def __init__(self, boy):
         self.boy = boy
-    def enter(self):
+    def enter(self, e):
         self.boy.dir = 0
     def exit(self, e):
         pass
@@ -74,9 +81,6 @@ class Sleep:
         else:
             self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592/2, '', self.boy.x + 25, self.boy.y - 25, 100, 100)
 # 5초 진행 후 idle
-def autorun_time_out(e):
-    return e[0] == 'AUTORUN_TIME_OUT'
-
 # 진입 키 입력
 def a_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
@@ -148,9 +152,9 @@ class Boy:
             self.IDLE,
             {
                 self.SLEEP : {space_down: self.IDLE},
-                self.IDLE : {time_out: self.SLEEP, space_down: self.SLEEP, right_down: self.RUN, left_down: self.RUN, right_up: self.RUN, left_up: self.RUN, a_down: self.AUTORUN},
+                self.IDLE : {time_out: self.SLEEP, right_down: self.RUN, left_down: self.RUN, right_up: self.RUN, left_up: self.RUN, a_down: self.AUTORUN},
                 self.RUN : {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE},
-                self.AUTORUN : {autorun_time_out: self.IDLE, right_down: self.RUN, left_down: self.RUN}
+                self.AUTORUN : {time_out: self.IDLE, right_down: self.RUN, left_down: self.RUN}
             }
         )
 
