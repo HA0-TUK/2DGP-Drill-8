@@ -73,6 +73,13 @@ class Sleep:
             self.boy.image.clip_composite_draw(self.boy.frame * 100, 300, 100, 100, 3.141592/2, '', self.boy.x - 25, self.boy.y - 25, 100, 100)
         else:
             self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592/2, '', self.boy.x + 25, self.boy.y - 25, 100, 100)
+# 5초 진행 후 idle
+def autorun_time_out(e):
+    pass
+
+# 진입 키 입력
+def a_down(e):
+    pass
 
 class AutoRun:
     def __init__(self,boy):
@@ -83,6 +90,7 @@ class AutoRun:
         # a 키입력으로 진입
 
     def exit(self):
+        #원래 크기로 복원?
         pass
     def do(self):
         pass
@@ -93,7 +101,7 @@ class AutoRun:
 
     def draw(self):
         pass
-# 5초 진행 후 idle
+
 # 방향키 입력 시 AutoRun -> 눌린 방향 Run
 
 class Boy:
