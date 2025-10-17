@@ -47,7 +47,7 @@ class Run:
             self.boy.dir = self.boy.face_dir = 1
         elif left_down(e) or right_up(e):
             self.boy.dir = self.boy.face_dir = -1
-    def exit(self, e=None):
+    def exit(self):
         pass
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
@@ -61,9 +61,9 @@ class Run:
 class Sleep:
     def __init__(self, boy):
         self.boy = boy
-    def enter(self, e=None):
+    def enter(self):
         self.boy.dir = 0
-    def exit(self, e=None):
+    def exit(self):
         pass
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
@@ -75,9 +75,24 @@ class Sleep:
             self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592/2, '', self.boy.x + 25, self.boy.y - 25, 100, 100)
 
 class AutoRun:
-    pass
-# a 키입력으로 진입
-# 키 조작 없이도 우로 계속 이동.
+    def __init__(self,boy):
+        self.boy = boy
+
+    def enter(self,e):
+        pass
+        # a 키입력으로 진입
+
+    def exit(self):
+        pass
+    def do(self):
+        pass
+        # 키 조작 없이도 좌우로 계속 이동.
+        # 속도 증가
+        # 크기 확대
+        # 화면 좌우 끝에서 방향전환.
+
+    def draw(self):
+        pass
 # 5초 진행 후 idle
 # 방향키 입력 시 AutoRun -> 눌린 방향 Run
 
