@@ -81,13 +81,20 @@ def autorun_time_out(e):
 def a_down(e):
     pass
 
-class AutoRun:
+class AUTORUN:
     def __init__(self,boy):
         self.boy = boy
 
-    def enter(self,e):
-        pass
+        self.start_time = 0
+        self.speed = 3
+
+        self.scale = 1.0
+
+    def enter(self):
         # a 키입력으로 진입
+        self.start_time = get_time()
+        self.boy.dir = self.boy.face_dir  # 현재 방향 유지
+
 
     def exit(self):
         #원래 크기로 복원?
@@ -121,10 +128,11 @@ class Boy:
             self.SLEEP : {space_down: self.IDLE},
             self.IDLE : {time_out: self.SLEEP, space_down: self.SLEEP, right_down: self.RUN, left_down: self.RUN, right_up: self.RUN, left_up: self.RUN},
             self.RUN : {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE}
+            #상태 추가
+            self.AUTORUN: {pass}
         }
  )
 
-    def update(self):
         self.state_machine.update()
 
     def handle_event(self, event):
