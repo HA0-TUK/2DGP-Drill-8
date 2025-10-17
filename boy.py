@@ -74,6 +74,12 @@ class Sleep:
         else:
             self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592/2, '', self.boy.x + 25, self.boy.y - 25, 100, 100)
 
+class AutoRun:
+    pass
+# a 키입력으로 진입
+# 키 조작 없이도 우로 계속 이동.
+# 5초 진행 후 idle
+# 방향키 입력 시 AutoRun -> 눌린 방향 Run
 
 class Boy:
     def __init__(self):
