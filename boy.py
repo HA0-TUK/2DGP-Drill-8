@@ -24,10 +24,10 @@ class Idle:
     def __init__(self, boy):
         self.boy = boy
 
-    def enter(self, e=None):
+    def enter(self, e):
         self.boy.dir = 0
 
-    def exit(self, e=None):
+    def exit(self, e):
         pass
 
     def do(self):
@@ -47,7 +47,7 @@ class Run:
             self.boy.dir = self.boy.face_dir = 1
         elif left_down(e) or right_up(e):
             self.boy.dir = self.boy.face_dir = -1
-    def exit(self):
+    def exit(self, e):
         pass
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
@@ -63,7 +63,7 @@ class Sleep:
         self.boy = boy
     def enter(self):
         self.boy.dir = 0
-    def exit(self):
+    def exit(self, e):
         pass
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
@@ -75,7 +75,7 @@ class Sleep:
             self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592/2, '', self.boy.x + 25, self.boy.y - 25, 100, 100)
 # 5초 진행 후 idle
 def autorun_time_out(e):
-    pass
+    return e[0] == 'AUTORUN_TIME_OUT'
 
 # 진입 키 입력
 def a_down(e):
@@ -96,7 +96,7 @@ class AUTORUN:
         self.boy.dir = self.boy.face_dir  # 현재 방향 유지
 
 
-    def exit(self):
+    def exit(self,e):
         self.scale = 1.0  # 원래 크기로 복원
         self.speed = 3
 
@@ -105,7 +105,7 @@ class AUTORUN:
         
         # 시간에 따른 속도와 크기 증가
         elapsed_time = get_time() - self.start_time
-        self.speed = 3 + (elapsed_time * 2)
+        self.speed = 3 + (elapsed_time * 4)
         self.scale = 1.0 + (elapsed_time * 0.2)
         
         # 키 조작 없이도 좌우로 계속 이동
