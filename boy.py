@@ -97,14 +97,25 @@ class AUTORUN:
 
 
     def exit(self):
-        #원래 크기로 복원?
-        pass
+        self.scale = 1.0  # 원래 크기로 복원
+        self.speed = 3
+
     def do(self):
-        pass
+        self.boy.frame = (self.boy.frame + 1) % 8
         # 키 조작 없이도 좌우로 계속 이동.
+        self.boy.x += self.boy.dir * self.speed
         # 속도 증가
+        elapsed_time = get_time() - self.start_time
+        self.speed = 3 + (elapsed_time * 2)
+        self.scale = 1.0 + (elapsed_time * 0.2)
         # 크기 확대
         # 화면 좌우 끝에서 방향전환.
+        if self.boy.x <= 50:
+            self.boy.x = 50
+            self.boy.dir = self.boy.face_dir = 1
+        elif self.boy.x >= 750:
+            self.boy.x = 750
+            self.boy.dir = self.boy.face_dir = -1
 
     def draw(self):
         pass
@@ -123,15 +134,14 @@ class Boy:
         self.SLEEP = Sleep(self)
         self.RUN = Run(self)
         self.state_machine = StateMachine(
-        self.IDLE,
-        {
-            self.SLEEP : {space_down: self.IDLE},
-            self.IDLE : {time_out: self.SLEEP, space_down: self.SLEEP, right_down: self.RUN, left_down: self.RUN, right_up: self.RUN, left_up: self.RUN},
-            self.RUN : {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE}
-            #상태 추가
-            self.AUTORUN: {pass}
-        }
- )
+            self.IDLE,
+            {
+                self.SLEEP : {space_down: self.IDLE},
+                self.IDLE : {time_out: self.SLEEP, space_down: self.SLEEP, right_down: self.RUN, left_down: self.RUN, right_up: self.RUN, left_up: self.RUN},
+                self.RUN : {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE}
+
+            }
+        )
 
         self.state_machine.update()
 
